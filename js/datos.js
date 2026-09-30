@@ -7,7 +7,16 @@
 const CONFIG = {
   titulo: 'Escuadrón Respeto',
   creditos: 'Departamento Psicopedagógico · Universidad Pedagógica Nacional, Unidad 112 Celaya',
-  ayudaInstitucional: 'Si vives o presencias discriminación, no estás solo/a: acude al Servicio de Género y No Discriminación o al Departamento Psicopedagógico de tu unidad.'
+  ayudaInstitucional: 'Si vives o presencias discriminación, no estás solo/a: acude al Servicio de Género y No Discriminación o al Departamento Psicopedagógico de tu unidad.',
+
+  /* REGISTRO DE RESULTADOS EN GOOGLE SHEETS
+     urlRegistro: pega aquí la URL de la aplicación web de Apps Script (termina en /exec).
+                  Si se deja vacía, el juego funciona igual pero no envía resultados.
+     claveRegistro: debe ser igual a la CLAVE del script (evita envíos ajenos).
+     grupos: lista de grupos para elegir. Si se deja vacía [], el alumno escribe su grupo. */
+  urlRegistro: '',
+  claveRegistro: 'respeto112',
+  grupos: []
 };
 
 /* Frases enemigas.

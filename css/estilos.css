@@ -120,6 +120,18 @@ p { line-height: 1.5; }
 .transformadas s { color: #ff8fab; }
 .transformadas b { color: var(--verde); }
 
+/* Registro */
+.registro { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 460px; margin: 4px auto 0; text-align: left; }
+.registro label { display: grid; gap: 4px; font-size: 13px; font-weight: 700; color: var(--tenue); }
+.registro input, .registro select {
+  width: 100%; min-height: 44px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--borde);
+  background: #0f0a2a; color: var(--texto); font: inherit; font-size: 16px; font-weight: 400;
+}
+.registro input:focus, .registro select:focus { outline: 2px solid var(--cian); outline-offset: 1px; }
+.registro .aviso { grid-column: 1 / -1; margin: 0; color: var(--naranja); font-size: 13px; }
+@media (max-width: 420px) { .registro { grid-template-columns: 1fr; } }
+.estado-registro { text-align: center; margin: 12px 0 0; }
+
 /* Orientación */
 #girar { position: fixed; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; padding: 16px; background: rgba(8, 4, 24, .92); }
 .icono-girar { font-size: 48px; color: var(--cian); animation: girar 2s ease-in-out infinite; }

@@ -29,6 +29,11 @@
       <p class="sobretitulo">Misión: cero discriminación</p>
       <h1 class="titulo">ESCUADRÓN<br>RESPETO</h1>
       <p class="lema">Transforma las frases que discriminan. Recoge cápsulas de poder… que solo se activan si respondes con conciencia.</p>
+      <div id="registro" class="registro" hidden>
+        <label>Nombre<input id="inNombre" type="text" maxlength="60" autocomplete="name" placeholder="Nombre y apellido"></label>
+        <label>Grupo<span id="grupoCampo"><input id="inGrupo" type="text" maxlength="30" placeholder="Ej. 3.º A"></span></label>
+        <p id="avisoRegistro" class="aviso" hidden>Escribe tu nombre y grupo para registrar tu resultado.</p>
+      </div>
       <div class="acciones">
         <button id="btnJugar" class="btn primario">Jugar</button>
         <button data-abrir="ayuda" class="btn">Cómo jugar</button>
@@ -124,6 +129,7 @@
       <div class="stats" id="finStats"></div>
       <h3>Frases que transformaste</h3>
       <ul class="transformadas" id="finFrases"></ul>
+      <p id="finRegistro" class="nota estado-registro" hidden></p>
       <div class="caja-reflexion"><p id="finMensaje"></p></div>
       <div class="acciones">
         <button id="btnOtraVez" class="btn primario">Jugar de nuevo</button>

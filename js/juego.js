@@ -92,7 +92,7 @@
   /* ---------- Partida y niveles ---------- */
   function nuevaPartida() {
     puntos = 0; vidas = 3; nivelIdx = 0;
-    stats = { eliminadas: 0, correctas: 0, respondidas: 0, transformadas: [] };
+    stats = { eliminadas: 0, correctas: 0, respondidas: 0, transformadas: [], falladas: [], inicio: Date.now(), nivelMax: 1 };
     mazo = barajar(PREGUNTAS); idxMazo = 0;
     J = { x: 130, y: H / 2, vel: 0, disparo: 1, laser: false, escudo: 0, aliados: 0, inv: 1.5, cd: 0, rastro: [] };
     iniciarNivel();
@@ -100,6 +100,7 @@
 
   function iniciarNivel() {
     const cfg = NIVELES[nivelIdx];
+    stats.nivelMax = Math.max(stats.nivelMax, nivelIdx + 1);
     balas = []; enemigos = []; balasEnem = []; capsulas = []; particulas = []; textos = []; jefe = null;
     N = { cfg, bajas: 0, meta: cfg.meta, spawnT: 1.5, jefeLanzado: false, alertaT: 0, sinCapsula: 0, finT: 0 };
     J.x = 130; J.y = H / 2; J.inv = 1.5; J.rastro = [];
@@ -673,6 +674,7 @@
       $('#qVeredicto').textContent = '¡Correcto! Poder activado: ' + PODERES[tipo].nombre + '.';
     } else {
       sfx.mal();
+      stats.falladas.push(q.p.length > 90 ? q.p.slice(0, 87) + '…' : q.p);
       $('#qVeredicto').textContent = 'Esta vez no se activó el poder. Lo importante es lo que aprendes:';
     }
     $('#qExplica').textContent = q.r;
@@ -723,7 +725,78 @@
     });
     $('#finMensaje').textContent = 'En la vida real no hay láseres: hay palabras, escucha y acción. ' + CONFIG.ayudaInstitucional;
     mostrarCapa('fin');
+    registrarResultado(gano);
   }
+
+  /* ---------- Registro de resultados (Google Sheets) ---------- */
+  const registroActivo = typeof CONFIG.urlRegistro === 'string' && /^https:\/\/script\.google\.com\//.test(CONFIG.urlRegistro);
+  let jugador = { nombre: leer('er_nombre') || '', grupo: leer('er_grupo') || '' };
+
+  function prepararRegistro() {
+    if (!registroActivo) return;
+    $('#registro').hidden = false;
+    if (Array.isArray(CONFIG.grupos) && CONFIG.grupos.length) {
+      const sel = document.createElement('select'); sel.id = 'inGrupo';
+      const op0 = document.createElement('option'); op0.value = ''; op0.textContent = 'Elige tu grupo'; sel.appendChild(op0);
+      CONFIG.grupos.forEach((g) => { const o = document.createElement('option'); o.value = g; o.textContent = g; sel.appendChild(o); });
+      const campo = $('#grupoCampo'); campo.innerHTML = ''; campo.appendChild(sel);
+    }
+    $('#inNombre').value = jugador.nombre;
+    $('#inGrupo').value = jugador.grupo;
+  }
+
+  function datosJugadorValidos() {
+    if (!registroActivo) return true;
+    const nombre = $('#inNombre').value.trim().replace(/\s+/g, ' ');
+    const grupo = $('#inGrupo').value.trim();
+    const ok = nombre.length >= 3 && grupo.length >= 1;
+    $('#avisoRegistro').hidden = ok;
+    if (!ok) { (nombre.length < 3 ? $('#inNombre') : $('#inGrupo')).focus(); return false; }
+    jugador = { nombre, grupo };
+    guardar('er_nombre', nombre); guardar('er_grupo', grupo);
+    return true;
+  }
+
+  function leerPendientes() { try { return JSON.parse(leer('er_pendientes') || '[]'); } catch (e) { return []; } }
+
+  async function enviarPendientes() {
+    if (!registroActivo || !navigator.onLine) return 0;
+    let pendientes = leerPendientes();
+    let enviados = 0;
+    while (pendientes.length) {
+      try {
+        await fetch(CONFIG.urlRegistro, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(pendientes[0]) });
+        pendientes.shift(); enviados++;
+        guardar('er_pendientes', JSON.stringify(pendientes));
+      } catch (e) { break; }
+    }
+    return pendientes.length;
+  }
+
+  async function registrarResultado(gano) {
+    const aviso = $('#finRegistro');
+    if (!registroActivo) { aviso.hidden = true; return; }
+    const registro = {
+      clave: CONFIG.claveRegistro || '',
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+      nombre: jugador.nombre, grupo: jugador.grupo,
+      puntos, resultado: gano ? 'Completó la misión' : 'Perdió las vidas',
+      nivel: stats.nivelMax, frases: stats.eliminadas,
+      correctas: stats.correctas, respondidas: stats.respondidas,
+      minutos: Math.round((Date.now() - stats.inicio) / 6000) / 10,
+      falladas: stats.falladas.join(' | ')
+    };
+    const lista = leerPendientes(); lista.push(registro);
+    guardar('er_pendientes', JSON.stringify(lista.slice(-50)));
+    aviso.hidden = false;
+    aviso.textContent = 'Enviando tu resultado…';
+    const restantes = await enviarPendientes();
+    aviso.textContent = restantes === 0
+      ? 'Resultado registrado a nombre de ' + jugador.nombre + ' (' + jugador.grupo + ').'
+      : 'Sin conexión: tu resultado se enviará la próxima vez que abras el juego con internet.';
+  }
+
+  window.addEventListener('online', () => { enviarPendientes(); });
 
   /* ---------- Controles ---------- */
   window.addEventListener('keydown', (e) => {
@@ -768,7 +841,7 @@
     } catch (e) { /* no soportado (iOS) */ }
   }
 
-  $('#btnJugar').addEventListener('click', () => { sonido(1, 0.01, 'sine', 0.0001); pantallaCompleta(); nuevaPartida(); });
+  $('#btnJugar').addEventListener('click', () => { if (!datosJugadorValidos()) return; sonido(1, 0.01, 'sine', 0.0001); pantallaCompleta(); nuevaPartida(); });
   $('#btnOtraVez').addEventListener('click', () => nuevaPartida());
   $('#btnPausa').addEventListener('click', alternarPausa);
   $('#btnReanudar').addEventListener('click', alternarPausa);
@@ -791,6 +864,8 @@
   }
 
   // Contenido inicial
+  prepararRegistro();
+  enviarPendientes();
   $('#creditos').textContent = CONFIG.creditos;
   $('#record').textContent = leer('er_record') || '0';
   const lp = $('#listaPoderes');

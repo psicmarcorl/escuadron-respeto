@@ -28,6 +28,18 @@ Abre js/datos.js (en GitHub: clic en el archivo y luego en el ícono del lápiz)
 
 Guarda con "Commit changes". Si el cambio no aparece en el celular, en sw.js cambia escuadron-respeto-v1 por v2, v3, etc.
 
+## Registro de resultados (Google Sheets)
+
+El juego puede enviar el resultado de cada partida a una hoja de cálculo de Google: nombre, grupo, puntos, nivel alcanzado, frases transformadas, respuestas correctas, minutos jugados y preguntas falladas. La hoja incluye una pestaña "Ranking" con el mejor puntaje de cada estudiante.
+
+1. Crea una hoja de cálculo nueva en Google Drive (por ejemplo, "Escuadrón Respeto - Resultados").
+2. Menú Extensiones → Apps Script. Borra el contenido y pega el código de registro/apps-script.gs. Guarda.
+3. Elige la función configurar y da clic en Ejecutar. Autoriza los permisos con tu cuenta.
+4. Implementar → Nueva implementación → tipo Aplicación web. Ejecutar como: Yo. Quién tiene acceso: Cualquier usuario. Implementar.
+5. Copia la URL que termina en /exec y pégala en js/datos.js, en urlRegistro. Guarda con "Commit changes".
+
+Mientras urlRegistro esté vacía, el juego funciona igual pero no pide nombre ni envía datos. Si un alumno juega sin internet, su resultado se envía la próxima vez que abra el juego con conexión.
+
 ## Controles
 
 - **Celular:** desliza el dedo en cualquier parte de la pantalla; la nave dispara sola.

@@ -1,6 +1,6 @@
 // Service worker: permite jugar sin conexión después de la primera visita.
 // Si actualizas archivos, cambia el número de versión.
-const CACHE = 'escuadron-respeto-v1';
+const CACHE = 'escuadron-respeto-v2';
 const ARCHIVOS = ['./', './index.html', './css/estilos.css', './js/datos.js', './js/juego.js',
   './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png'];
 
