@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0b0620">
+  <meta name="description" content="Juego educativo para eliminar frases discriminatorias y reflexionar sobre la no discriminación.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Escuadrón Respeto">
+  <title>Escuadrón Respeto</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <div id="escenario"><canvas id="juego" aria-label="Área de juego"></canvas></div>
+
+  <div id="botones-hud" class="oculto">
+    <button id="btnSonido" class="btn-hud" aria-label="Activar o silenciar sonido">♪</button>
+    <button id="btnPausa" class="btn-hud" aria-label="Pausa">II</button>
+  </div>
+
+  <!-- MENÚ -->
+  <section id="menu" class="capa visible">
+    <div class="tarjeta centro">
+      <p class="sobretitulo">Misión: cero discriminación</p>
+      <h1 class="titulo">ESCUADRÓN<br>RESPETO</h1>
+      <p class="lema">Transforma las frases que discriminan. Recoge cápsulas de poder… que solo se activan si respondes con conciencia.</p>
+      <div class="acciones">
+        <button id="btnJugar" class="btn primario">Jugar</button>
+        <button data-abrir="ayuda" class="btn">Cómo jugar</button>
+        <button data-abrir="fuentes" class="btn">Fuentes</button>
+      </div>
+      <p class="record">Récord: <span id="record">0</span></p>
+      <p class="creditos" id="creditos"></p>
+    </div>
+  </section>
+
+  <!-- AYUDA -->
+  <section id="ayuda" class="capa">
+    <div class="tarjeta">
+      <h2>Cómo jugar</h2>
+      <ul class="lista">
+        <li><strong>Celular o tableta:</strong> desliza el dedo en cualquier parte de la pantalla para mover la nave. Dispara sola.</li>
+        <li><strong>Computadora:</strong> flechas o W A S D para moverte, P para pausar. También puedes arrastrar con el ratón.</li>
+        <li>Las naves enemigas llevan <strong>frases que discriminan</strong>. Al destruirlas se transforman en un mensaje respetuoso.</li>
+        <li>Las naves con borde <span class="naranja">naranja</span> sueltan una <strong>cápsula de poder</strong>. Para activarla debes responder una pregunta sobre discriminación.</li>
+        <li>Si respondes mal no pierdes vidas, pero el poder no se activa. Lee la explicación: ¡es parte de la misión!</li>
+        <li>Transforma suficientes frases y enfrenta a los tres jefes: <em>el Estereotipo, el Prejuicio y la Discriminación</em>.</li>
+      </ul>
+      <h3>Poderes</h3>
+      <div class="poderes" id="listaPoderes"></div>
+      <div class="acciones"><button data-abrir="menu" class="btn primario">Volver</button></div>
+    </div>
+  </section>
+
+  <!-- FUENTES -->
+  <section id="fuentes" class="capa">
+    <div class="tarjeta">
+      <h2>Fuentes consultadas</h2>
+      <ul class="lista refs">
+        <li>Allport, G. W. (1954). <em>The nature of prejudice</em>. Addison-Wesley.</li>
+        <li>Cámara de Diputados del H. Congreso de la Unión. (2003). <em>Ley Federal para Prevenir y Eliminar la Discriminación</em>. Diario Oficial de la Federación.</li>
+        <li>Cámara de Diputados del H. Congreso de la Unión. (2003). <em>Ley General de Derechos Lingüísticos de los Pueblos Indígenas</em>. Diario Oficial de la Federación.</li>
+        <li>Constitución Política de los Estados Unidos Mexicanos. Artículo 1.º. (1917, reformada).</li>
+        <li>Crenshaw, K. (1989). Demarginalizing the intersection of race and sex. <em>University of Chicago Legal Forum, 1989</em>(1), 139–167.</li>
+        <li>Organización de las Naciones Unidas. (2006). <em>Convención sobre los Derechos de las Personas con Discapacidad</em>.</li>
+        <li>Pettigrew, T. F., &amp; Tropp, L. R. (2006). A meta-analytic test of intergroup contact theory. <em>Journal of Personality and Social Psychology, 90</em>(5), 751–783. https://doi.org/10.1037/0022-3514.90.5.751</li>
+        <li>Sue, D. W., Capodilupo, C. M., Torino, G. C., Bucceri, J. M., Holder, A. M. B., Nadal, K. L., &amp; Esquilin, M. (2007). Racial microaggressions in everyday life. <em>American Psychologist, 62</em>(4), 271–286. https://doi.org/10.1037/0003-066X.62.4.271</li>
+      </ul>
+      <p class="nota">Las frases enemigas se muestran únicamente con fines educativos, para reconocerlas y transformarlas.</p>
+      <div class="acciones"><button data-abrir="menu" class="btn primario">Volver</button></div>
+    </div>
+  </section>
+
+  <!-- PREGUNTA -->
+  <section id="quiz" class="capa" aria-live="polite">
+    <div class="tarjeta">
+      <p class="sobretitulo">¡Cápsula obtenida!</p>
+      <div id="qPoder" class="q-poder"></div>
+      <p class="q-inst">Responde para activar el poder:</p>
+      <h2 id="qTexto" class="q-texto"></h2>
+      <div id="qOpciones" class="q-opciones"></div>
+      <div id="qRetro" class="q-retro" hidden>
+        <strong id="qVeredicto"></strong>
+        <p id="qExplica"></p>
+      </div>
+      <div class="acciones"><button id="qSeguir" class="btn primario" hidden>Continuar misión</button></div>
+    </div>
+  </section>
+
+  <!-- PAUSA -->
+  <section id="pausa" class="capa">
+    <div class="tarjeta centro">
+      <h2>Pausa</h2>
+      <div class="acciones col">
+        <button id="btnReanudar" class="btn primario">Continuar</button>
+        <button id="btnReiniciar" class="btn">Reiniciar partida</button>
+        <button id="btnSalir" class="btn">Salir al menú</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- NIVEL SUPERADO -->
+  <section id="nivel" class="capa">
+    <div class="tarjeta">
+      <p class="sobretitulo" id="nvSobre"></p>
+      <h2 id="nvTitulo"></h2>
+      <p id="nvTexto"></p>
+      <div class="caja-reflexion"><strong>Para reflexionar</strong><p id="nvReflexion"></p></div>
+      <p class="nota">Modelo de Allport (1954): estereotipo → prejuicio → discriminación.</p>
+      <div class="acciones"><button id="btnSiguiente" class="btn primario">Siguiente nivel</button></div>
+    </div>
+  </section>
+
+  <!-- FIN -->
+  <section id="fin" class="capa">
+    <div class="tarjeta">
+      <p class="sobretitulo" id="finSobre"></p>
+      <h2 id="finTitulo"></h2>
+      <div class="stats" id="finStats"></div>
+      <h3>Frases que transformaste</h3>
+      <ul class="transformadas" id="finFrases"></ul>
+      <div class="caja-reflexion"><p id="finMensaje"></p></div>
+      <div class="acciones">
+        <button id="btnOtraVez" class="btn primario">Jugar de nuevo</button>
+        <button data-abrir="menu" class="btn">Menú</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- AVISO DE ORIENTACIÓN -->
+  <div id="girar">
+    <div class="tarjeta centro">
+      <div class="icono-girar" aria-hidden="true">⟳</div>
+      <p><strong>Gira tu teléfono</strong><br>El juego se disfruta mejor en horizontal.</p>
+      <button id="btnIgnorarGiro" class="btn">Jugar así</button>
+    </div>
+  </div>
+
+  <script src="js/datos.js"></script>
+  <script src="js/juego.js"></script>
+</body>
+</html>
